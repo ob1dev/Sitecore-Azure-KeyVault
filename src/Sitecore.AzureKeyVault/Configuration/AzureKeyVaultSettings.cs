@@ -21,6 +21,35 @@ namespace Sitecore.Configuration
       this.Client = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(this.GetToken));
     }
 
+    public override string GetConnectionString(string connectionStringName)
+    {
+      Assert.ArgumentNotNullOrEmpty(connectionStringName, nameof(connectionStringName));
+
+      var connectionString = string.Empty;
+
+      if (this.decryptedSecrets.ContainsKey(connectionStringName))
+      {
+        connectionString = this.decryptedSecrets[connectionStringName];
+      }
+      else
+      {
+        var setting = WebConfigurationManager.ConnectionStrings[connectionStringName];
+        Assert.IsNotNull(setting, "Unknown connection string. Name: '{0}'", connectionStringName);
+
+        connectionString = setting.ConnectionString;
+        Assert.IsNotNullOrEmpty(connectionString, "Connection string is empty. Name: '{0}'", connectionStringName);
+
+        if (this.IsSecretIdentifier(connectionString))
+        {
+          var secret = this.Client.GetSecretAsync(connectionString).Result;
+          connectionString = secret.Value;
+          this.decryptedSecrets.TryAdd(connectionStringName, connectionString);
+        }        
+      }
+
+      return connectionString;
+    }
+
     protected async Task<string> GetToken(string authority, string resource, string scope)
     {
       var authContext = new AuthenticationContext(authority);
@@ -39,31 +68,9 @@ namespace Sitecore.Configuration
       return result.AccessToken;
     }
 
-    public override string GetConnectionString(string connectionStringName)
+    protected bool IsSecretIdentifier(string ConnectionString)
     {
-      Assert.ArgumentNotNullOrEmpty(connectionStringName, nameof(connectionStringName));
-
-      var connectionString = string.Empty;
-
-      if (this.decryptedSecrets.ContainsKey(connectionStringName))
-      {
-        connectionString = this.decryptedSecrets[connectionStringName];
-      }
-      else
-      {
-        var setting = WebConfigurationManager.ConnectionStrings[connectionStringName];
-        Assert.IsNotNull(setting, "Unknown connection string. Name: '{0}'", connectionStringName);
-
-        var secretIdentifier = setting.ConnectionString;
-        var secret = this.Client.GetSecretAsync(secretIdentifier).Result;
-
-        connectionString = secret.Value;
-        Assert.IsNotNullOrEmpty(connectionString, "Connection string is empty. Name: '{0}'", connectionStringName);
-
-        this.decryptedSecrets.TryAdd(connectionStringName, connectionString);
-      }
-
-      return connectionString;
+      return ConnectionString.Contains(".vault.azure.net");
     }
   }
 }
