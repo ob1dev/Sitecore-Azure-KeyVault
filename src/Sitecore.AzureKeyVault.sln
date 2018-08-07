@@ -5,6 +5,11 @@ VisualStudioVersion = 15.0.27924.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sitecore.AzureKeyVault", "Sitecore.AzureKeyVault\Sitecore.AzureKeyVault.csproj", "{1B6BBE5D-4742-40F2-B81E-97651F4DA431}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E20F8A3E-4D31-4446-ABD7-4381BF079D85}"
+	ProjectSection(SolutionItems) = preProject
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
