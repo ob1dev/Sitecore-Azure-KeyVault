@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sitecore.DependencyInjection
 {
-  class AzureKeyVaultConfigurator : IServicesConfigurator
+  public class AzureKeyVaultConfigurator : IServicesConfigurator
   {
     public void Configure(IServiceCollection serviceCollection)
     {
