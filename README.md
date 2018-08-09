@@ -115,7 +115,7 @@ az ad app list --display-name SitecoreAzureKeyVault --query [].appId
 
 <profile>
   <providers>
-  <clear />
+  ...
     <add name="sql" type="System.Web.Profile.SqlProfileProvider" connectionStringName="security" ... />
   ...
   </providers>
